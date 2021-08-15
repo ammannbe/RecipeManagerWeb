@@ -118,6 +118,9 @@ export default {
       try {
         await this.$auth.loginWith('laravelSanctum', { data: this.data })
         this.$auth.redirect('home')
+        setTimeout(() => {
+          location.reload()
+        }, 400)
       } catch (error) {
         const errors = error.response.data.errors || null
         this.errors = { ...this.errors, ...errors }
