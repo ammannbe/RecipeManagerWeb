@@ -1,0 +1,21 @@
+{
+  "by": "von",
+  "The source code is licensed under the {0}.": "Der Quellcode ist unter der {0} lizenziert.",
+  "The website content is licensed under the {0}.": "Der Website-Inhalt ist unter der {0} lizenziert.",
+  "Toggle mini menu": "Mini-Menü umschalten",
+  "complexity": "normal | mittel | schwierig",
+  "Cookbook": "Kochbuch",
+  "Public": "Öffentlich",
+  "Author": "Autor",
+  "Servings": "Portionen",
+  "Complexity": "Schwierigkeit",
+  "Preparation time": "Zubereitungszeit",
+  "Instructions": "Zubereitung",
+  "Home": "Home",
+  "{0} is required": "{0} ist erforderlich",
+  "{0} is invalid": "{0} ist ungültig",
+  "Password": "Passwort",
+  "E-Mail": "E-Mail",
+  "Login": "Anmelden",
+  "Logout":"Abmelden"
+}

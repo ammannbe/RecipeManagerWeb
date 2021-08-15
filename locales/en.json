@@ -1,0 +1,21 @@
+{
+  "by": "by",
+  "The source code is licensed under the {0}.": "The source code is licensed under the {0}.",
+  "The website content is licensed under the {0}.": "The website content is licensed under the {0}.",
+  "Toggle mini menu": "Toggle mini menu",
+  "complexity": "simple | normal | difficult",
+  "Cookbook": "Cookbook",
+  "Public": "Public",
+  "Author": "Author",
+  "Servings": "Servings",
+  "Complexity": "Complexity",
+  "Preparation time": "Preparation time",
+  "Instructions": "Instructions",
+  "Home": "Home",
+  "{0} is required": "{0} is required",
+  "{0} is invalid": "{0} is invalid",
+  "Password": "Password",
+  "E-Mail": "E-Mail",
+  "Login": "Login",
+  "Logout":"Logout"
+}
