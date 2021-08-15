@@ -42,6 +42,7 @@
       :recipe="recipe"
       :ingredient="ingredient"
       :ingredients="ingredients"
+      :units="units"
       :foods="foods"
       :ingredient-attributes="ingredientAttributes"
       @update:ingredient="updateIngredient"
@@ -97,6 +98,7 @@
       :recipe="recipe"
       :ingredient="ingredient"
       :ingredients="ingredients"
+      :units="units"
       :foods="foods"
       :ingredient-attributes="ingredientAttributes"
       @update:ingredient="updateIngredient"
@@ -120,6 +122,7 @@ export default {
     servings: { type: Number, required: true },
     ingredient: { type: Object, required: true },
     ingredients: { type: Array, required: true },
+    units: { type: Array, required: true },
     foods: { type: Array, required: true },
     ingredientAttributes: { type: Array, required: true },
     editMode: { type: Boolean, default: false },

@@ -59,6 +59,36 @@
               </v-col>
               <v-col cols="12">
                 <v-autocomplete
+                  v-if="$config.DISABLE_UNIT_CREATION"
+                  v-model="form.unit_id"
+                  :items="units"
+                  item-text="name"
+                  item-value="id"
+                  :label="$t('Unit') + '*'"
+                  :rules="rules.unit_id"
+                  :error="errors.unit_id.length > 0"
+                  :error-messages="errors.unit_id"
+                  auto-select-first
+                  dense
+                  @change="errors.unit_id = []"
+                />
+                <v-combobox
+                  v-else
+                  v-model="form.unit"
+                  :items="units"
+                  item-text="name"
+                  item-value="id"
+                  :label="$t('Unit')"
+                  :rules="rules.unit_id"
+                  :error="errors.unit_id.length > 0"
+                  :error-messages="errors.unit_id"
+                  dense
+                  @change="errors.unit_id = []"
+                  @input="errors.unit_id = []"
+                />
+              </v-col>
+              <v-col cols="12">
+                <v-autocomplete
                   v-if="$config.DISABLE_FOOD_CREATION"
                   v-model="form.food_id"
                   :items="foods"
@@ -160,6 +190,7 @@ export default {
     edit: { type: Boolean, required: true },
     ingredient: { type: Object, required: true },
     ingredients: { type: Array, required: true },
+    units: { type: Array, required: true },
     foods: { type: Array, required: true },
     ingredientAttributes: { type: Array, required: true },
   },
@@ -174,6 +205,8 @@ export default {
         ingredient_id: this.ingredient.ingredient_id,
         amount: this.ingredient.amount,
         amount_max: this.ingredient.amount_max,
+        unit_id: this.ingredient.unit_id,
+        unit: this.ingredient.unit,
         food_id: this.ingredient.food_id,
         food: this.ingredient.food,
         ingredient_attributes: this.ingredient.ingredient_attributes.map(
@@ -202,6 +235,7 @@ export default {
               this.form.amount,
             ]),
         ],
+        unit_id: [],
         food_id: [(v) => !!v || this.$t('{0} is required', [this.$t('Food')])],
         ingredient_attributes: [
           (v) =>
@@ -216,6 +250,7 @@ export default {
         ingredient_id: [],
         amount: [],
         amount_max: [],
+        unit_id: [],
         food_id: [],
         ingredient_attributes: [],
         ingredient_attribute_names: [],
@@ -243,6 +278,13 @@ export default {
         )
       })
 
+      if (!this.$config.DISABLE_UNIT_CREATION) {
+        this.form.unit_id = await this.createUnit(this.form.unit)
+        if (this.form.unit_id === false) {
+          return
+        }
+      }
+
       if (!this.$config.DISABLE_FOOD_CREATION) {
         this.form.food_id = await this.createFood(this.form.food)
         if (this.form.food_id === false) {
@@ -260,6 +302,8 @@ export default {
       }
 
       try {
+        delete this.form.ingredient_group
+        delete this.form.unit
         delete this.form.food
         delete this.form.ingredient_attribute_names
 
@@ -282,11 +326,47 @@ export default {
       this.$emit('update:ingredient', {
         ...this.ingredient,
         ...this.form,
+        unit: this.units.find((c) => c.id === this.form.unit_id),
         food: this.foods.find((c) => c.id === this.form.food_id),
         ingredient_attributes: ingredientAttributes,
       })
 
       this.dialog = false
+    },
+    async createUnit(unit = null) {
+      if (!unit) {
+        return null
+      }
+
+      if (unit.id) {
+        return unit.id
+      }
+
+      const name = unit.trim()
+
+      const found = this.units.find((g) => g.name === name)
+      if (found) {
+        return found.id
+      }
+
+      try {
+        unit = await this.$axios.$post('/api/units', { name })
+        return unit.id
+      } catch (error) {
+        // eslint-disable-next-line camelcase
+        const unit_id = error.response.data.errors.name || null
+        this.errors = { ...this.errors, unit_id }
+
+        if (!this.hasAnyError) {
+          this.snackbar.type = 'error'
+          this.snackbar.message =
+            error.response.data.message ||
+            this.$t('An unexpected error occured')
+          this.snackbar.open = true
+        }
+
+        return false
+      }
     },
     async createFood(food = null) {
       if (!food) {
@@ -374,6 +454,7 @@ export default {
     cancel() {
       this.form.amount = null
       this.form.amount_max = null
+      this.form.unit_id = null
       this.form.food_id = null
       this.form.ingredient_attributes = []
       this.dialog = false

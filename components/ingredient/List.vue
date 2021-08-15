@@ -32,6 +32,7 @@
             :ingredient="ingredient"
             :ingredients="ingredients"
             :edit-mode="editMode"
+            :units="units"
             :foods="foods"
             :ingredient-attributes="ingredientAttributes"
             @update:ingredient="updateIngredient"
@@ -45,6 +46,7 @@
             :ingredient="{ ...alternate, ingredient }"
             :ingredients="ingredients"
             :edit-mode="editMode"
+            :units="units"
             :foods="foods"
             :ingredient-attributes="ingredientAttributes"
             :is-first="i === 0"
@@ -74,12 +76,14 @@ export default {
 
   data() {
     return {
+      units: [],
       foods: [],
       ingredientAttributes: [],
     }
   },
 
   async fetch() {
+    this.units = await this.$axios.$get('/api/units')
     this.foods = await this.$axios.$get('/api/foods')
     this.ingredientAttributes = await this.$axios.$get(
       '/api/ingredient-attributes'

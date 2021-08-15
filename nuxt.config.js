@@ -3,6 +3,7 @@ import locales from './locales'
 export default {
   publicRuntimeConfig: {
     APP_NAME: process.env.APP_NAME || 'RecipeManager',
+    DISABLE_UNIT_CREATION: process.env.DISABLE_UNIT_CREATION,
     DISABLE_FOOD_CREATION: process.env.DISABLE_FOOD_CREATION,
     DISABLE_INGREDIENT_ATTRIBUTE_CREATION:
       process.env.DISABLE_INGREDIENT_ATTRIBUTE_CREATION,
