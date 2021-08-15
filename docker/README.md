@@ -21,10 +21,6 @@ See also: [Laravel Configuration](https://laravel.com/docs/8.x/configuration)
 - **APP_NAME:** Name of the App. _Default: RecipeManager_
 - **API_URL** The full api URL. _Default: http://127.0.0.1:8000_
 
-## App versions
-
--   **APP_VERSION:** Docker image version.
-
 ## Locales
 
 - **LOCALE:** The default app locale _Default: en_
