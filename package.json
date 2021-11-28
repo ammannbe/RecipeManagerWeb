@@ -11,32 +11,32 @@
     "lint": "npm run lint:js"
   },
   "dependencies": {
-    "@blokwise/dynamic": "^1.4.1",
-    "@mdi/font": "^5.9.55",
-    "@nuxt/http": "^0.6.2",
-    "@nuxtjs/auth-next": "5.0.0-1624817847.21691f1",
+    "@blokwise/dynamic": "^1.5.0",
+    "@mdi/font": "^6.5.95",
+    "@nuxt/http": "^0.6.4",
+    "@nuxtjs/auth-next": "5.0.0-1637745161.ea53f98",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/pwa": "^3.3.5",
-    "core-js": "^3.8.3",
-    "nuxt": "^2.13.3",
-    "nuxt-i18n": "^6.20.0",
+    "core-js": "^3.19.1",
+    "nuxt": "^2.2.0",
+    "nuxt-i18n": "^6.28.1",
     "remarkable": "^2.0.1",
     "vuedraggable": "^2.24.3",
-    "vuejs-clipper": "^3.1.2"
+    "vuejs-clipper": "^4.0.0"
   },
   "devDependencies": {
-    "@nuxt/types": "^2.14.12",
-    "@nuxt/typescript-build": "^2.0.4",
+    "@nuxt/types": "^2.15.8",
+    "@nuxt/typescript-build": "^2.1.0",
     "@nuxtjs/dotenv": "^1.4.1",
-    "@nuxtjs/eslint-config-typescript": "^5.0.0",
+    "@nuxtjs/eslint-config-typescript": "^7.0.2",
     "@nuxtjs/eslint-module": "^3.0.2",
-    "@nuxtjs/vuetify": "^1.11.3",
+    "@nuxtjs/vuetify": "^1.12.1",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.18.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-nuxt": "^2.0.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-vue": "^7.5.0",
-    "prettier": "^2.2.1"
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-nuxt": "^3.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-vue": "^8.1.1",
+    "prettier": "^2.5.0"
   }
 }
