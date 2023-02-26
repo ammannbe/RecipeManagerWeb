@@ -1,5 +1,11 @@
 <template>
   <v-card>
+    <recipe-social-sharing
+      :recipe="recipe"
+      :author="recipe.author"
+      :category="recipe.category"
+    />
+
     <v-breadcrumbs :light="!$vuetify.theme.dark" :items="breadcrumbs">
       <template #divider>
         <v-icon>mdi-chevron-right</v-icon>
@@ -157,6 +163,7 @@
           :show.sync="createIngredient"
           :recipe="recipe"
           :ingredients="ingredients"
+          :units="units"
           :foods="foods"
           :ingredient-attributes="ingredientAttributes"
           :ingredient-groups="ingredientGroups"
@@ -233,6 +240,7 @@ export default {
     const ingredientGroups = await $axios.$get(
       `/api/recipes/${params.id}/ingredient-groups`
     )
+    const units = await $axios.$get('/api/units')
     const foods = await $axios.$get('/api/foods')
     const ingredientAttributes = await $axios.$get('/api/ingredient-attributes')
 
@@ -242,6 +250,7 @@ export default {
       recipe,
       ingredients,
       ingredientGroups,
+      units,
       foods,
       ingredientAttributes,
       servings,
@@ -337,6 +346,7 @@ export default {
       this.ingredientAttributes = await this.$axios.$get(
         `/api/ingredient-attributes`
       )
+      this.units = await this.$axios.$get('/api/units')
       this.foods = await this.$axios.$get('/api/foods')
     },
     diashowRewind(increment = 1) {

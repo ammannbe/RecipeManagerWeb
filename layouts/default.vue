@@ -70,6 +70,8 @@
     </v-navigation-drawer>
 
     <v-main>
+      <recipe-add :showDialog="toggleAddRecipe" :cookbooks="cookbooks" :categories="categories" @close="toggleAddRecipe = false"></recipe-add>
+
       <v-container>
         <nuxt />
       </v-container>
@@ -109,9 +111,34 @@
 
 <script>
 export default {
+  mounted() {
+    const cookbookPagination = {
+      page: 1,
+      limit: 100,
+      total: 0,
+      isLoading: false,
+    }
+    const cookbookQuery = new URLSearchParams({
+      page: cookbookPagination.page,
+      limit: cookbookPagination.limit,
+      trashed: true,
+    })
+    const cookbookResponse = this.$axios.$get(
+      `/api/cookbooks?${cookbookQuery}`
+    ).then(cookbookResponse => {
+      this.cookbooks = cookbookResponse.data
+      cookbookPagination.total = cookbookResponse.total
+    })
+
+    this.$axios.$get('/api/categories').then(categories => this.categories = categories);
+  },
+
   data() {
     return {
       drawer: false,
+      toggleAddRecipe: false,
+      cookbooks: [],
+      categories: [],
     }
   },
 
@@ -123,6 +150,11 @@ export default {
             icon: 'mdi-account',
             title: this.$t('Account'),
             to: '/account',
+          },
+          {
+            icon: 'mdi-plus',
+            title: this.$t('Add recipe'),
+            click: () => this.toggleAddRecipe = true,
           },
           {
             icon: this.$auth.user.admin ? 'mdi-cog' : '',
@@ -162,6 +194,11 @@ export default {
 
   methods: {
     async logout() {
+      await this.$auth.logout()
+      this.$auth.redirect('logout')
+      location.reload()
+    },
+    async addRecipe() {
       await this.$auth.logout()
       this.$auth.redirect('logout')
       location.reload()

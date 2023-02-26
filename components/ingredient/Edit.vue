@@ -64,7 +64,7 @@
                   :items="units"
                   item-text="name"
                   item-value="id"
-                  :label="$t('Unit') + '*'"
+                  :label="$t('Unit')"
                   :rules="rules.unit_id"
                   :error="errors.unit_id.length > 0"
                   :error-messages="errors.unit_id"

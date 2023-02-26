@@ -1,4 +1,3 @@
-// TODO: add: name_shortcut, name_plural, name_plural_shortcut
 <template>
   <div>
     <v-card>
@@ -23,7 +22,7 @@
           },
           { value: 'actions' },
         ]"
-        :items="units"
+        :items="foods"
         :items-per-page="15"
         :loading="isLoading"
       >
@@ -32,7 +31,7 @@
             <v-icon>mdi-plus-circle</v-icon>
             <v-dialog v-model="isAdding" width="500">
               <v-card>
-                <v-card-title>Add new unit</v-card-title>
+                <v-card-title>Add new food</v-card-title>
 
                 <v-divider class="mb-4" />
 
@@ -40,12 +39,12 @@
                   <v-form
                     ref="form"
                     v-model="validAdd"
-                    @submit.prevent="addUnit"
+                    @submit.prevent="addFood"
                   >
                     <v-row>
                       <v-col cols="12">
                         <v-text-field
-                          v-model="unitAdding.name"
+                          v-model="foodAdding.name"
                           type="text"
                           :label="$t('Name')"
                           :rules="rules.name"
@@ -72,7 +71,7 @@
                             color="blue darken-1"
                             text
                             :disabled="!validAdd"
-                            @click.prevent="addUnit"
+                            @click.prevent="addFood"
                           >
                             {{ $t('Save') }}
                           </v-btn>
@@ -112,35 +111,35 @@
               small
               @click="
                 isEditing = true
-                unitUpdating = item
+                foodUpdating = item
               "
             >
               mdi-pencil
             </v-icon>
           </v-btn>
           <v-btn v-if="!item.deleted_at" icon>
-            <v-icon small color="error" :disabled="!item.can_delete" @click="destroyUnit(item)">
+            <v-icon small color="error" :disabled="!item.can_delete" @click="destroyFood(item)">
               mdi-delete
             </v-icon>
           </v-btn>
           <v-btn v-if="!!item.deleted_at" icon>
-            <v-icon small @click="restoreUnit(item)">mdi-restore</v-icon>
+            <v-icon small @click="restoreFood(item)">mdi-restore</v-icon>
           </v-btn>
         </template>
       </v-data-table>
 
       <v-dialog v-model="isEditing" width="500">
         <v-card>
-          <v-card-title>Edit {{ unitUpdating.name }}</v-card-title>
+          <v-card-title>Edit {{ foodUpdating.name }}</v-card-title>
 
           <v-divider class="mb-4" />
 
           <v-card-text>
-            <v-form ref="form" v-model="validEdit" @submit.prevent="updateUnit">
+            <v-form ref="form" v-model="validEdit" @submit.prevent="updateFood">
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="unitUpdating.name"
+                    v-model="foodUpdating.name"
                     type="text"
                     :label="$t('Name')"
                     :rules="rules.name"
@@ -163,7 +162,7 @@
                       color="blue darken-1"
                       text
                       :disabled="!validEdit"
-                      @click.prevent="updateUnit"
+                      @click.prevent="updateFood"
                     >
                       {{ $t('Save') }}
                     </v-btn>
@@ -182,12 +181,12 @@
 export default {
   data() {
     return {
-      units: [],
+      foods: [],
       isLoading: false,
       isEditing: false,
       isAdding: false,
-      unitUpdating: {},
-      unitAdding: {},
+      foodUpdating: {},
+      foodAdding: {},
       validAdd: true,
       validEdit: true,
       rules: {
@@ -207,7 +206,7 @@ export default {
   },
 
   mounted() {
-    this.loadUnits()
+    this.loadFoods()
   },
 
   methods: {
@@ -217,34 +216,34 @@ export default {
         this.$config.LOCALE_FORMAT
       )
     },
-    async loadUnits() {
+    async loadFoods() {
       this.isLoading = true
-      this.units = await this.$axios.$get('/api/units')
+      this.foods = await this.$axios.$get('/api/foods')
       this.isLoading = false
     },
-    async destroyUnit(unit) {
+    async destroyFood(food) {
       this.isLoading = true
-      await this.$axios.$delete(`/api/units/${unit.id}`)
-      const i = this.units.findIndex((r) => r.id === unit.id)
-      this.units[i].deleted_at = new Date()
+      await this.$axios.$delete(`/api/foods/${food.id}`)
+      const i = this.foods.findIndex((r) => r.id === food.id)
+      this.foods[i].deleted_at = new Date()
       this.isLoading = false
     },
-    async restoreUnit(unit) {
+    async restoreFood(food) {
       this.isLoading = true
-      await this.$axios.$post(`/api/units/${unit.id}/restore`)
-      const i = this.units.findIndex((r) => r.id === unit.id)
-      this.units[i].deleted_at = null
+      await this.$axios.$post(`/api/foods/${food.id}/restore`)
+      const i = this.foods.findIndex((r) => r.id === food.id)
+      this.foods[i].deleted_at = null
       this.isLoading = false
     },
-    async updateUnit() {
+    async updateFood() {
       this.isLoading = true
       const payload = {
-        name: this.unitUpdating.name,
-        email: this.unitUpdating.email,
-        admin: this.unitUpdating.admin,
+        name: this.foodUpdating.name,
+        email: this.foodUpdating.email,
+        admin: this.foodUpdating.admin,
       }
       try {
-        await this.$axios.$patch(`/api/units/${this.unitUpdating.id}`, payload)
+        await this.$axios.$patch(`/api/foods/${this.foodUpdating.id}`, payload)
       } catch (error) {
         const errors = error.response.data.errors || null
         this.errors = { ...this.errors, ...errors }
@@ -252,21 +251,21 @@ export default {
         return
       }
 
-      const i = this.units.findIndex((c) => c.id === this.unitUpdating.id)
-      this.units[i] = { ...this.units[i], ...payload }
+      const i = this.foods.findIndex((c) => c.id === this.foodUpdating.id)
+      this.foods[i] = { ...this.foods[i], ...payload }
       this.isLoading = false
-      this.unitUpdating = this.units[i]
+      this.foodUpdating = this.foods[i]
       this.isEditing = false
     },
-    async addUnit() {
+    async addFood() {
       this.isLoading = true
       const payload = {
-        name: this.unitAdding.name,
-        email: this.unitAdding.email,
-        admin: this.unitAdding.admin,
+        name: this.foodAdding.name,
+        email: this.foodAdding.email,
+        admin: this.foodAdding.admin,
       }
       try {
-        await this.$axios.$post(`/api/units`, payload)
+        await this.$axios.$post(`/api/foods`, payload)
       } catch (error) {
         const errors = error.response.data.errors || null
         this.errors = { ...this.errors, ...errors }
@@ -275,9 +274,9 @@ export default {
       }
 
       this.isLoading = false
-      this.unitAdding = {}
+      this.foodAdding = {}
       this.isAdding = false
-      this.loadUnits()
+      this.loadFoods()
     },
   },
 }

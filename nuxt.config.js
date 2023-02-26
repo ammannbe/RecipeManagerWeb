@@ -168,5 +168,8 @@ export default {
         maxSize: 256000,
       },
     },
+    transpile: [
+      'defu',
+    ],
   },
 }

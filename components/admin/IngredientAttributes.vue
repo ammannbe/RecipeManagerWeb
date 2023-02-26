@@ -1,4 +1,3 @@
-// TODO: add: name_shortcut, name_plural, name_plural_shortcut
 <template>
   <div>
     <v-card>
@@ -23,7 +22,7 @@
           },
           { value: 'actions' },
         ]"
-        :items="units"
+        :items="ingredientAttributes"
         :items-per-page="15"
         :loading="isLoading"
       >
@@ -32,7 +31,7 @@
             <v-icon>mdi-plus-circle</v-icon>
             <v-dialog v-model="isAdding" width="500">
               <v-card>
-                <v-card-title>Add new unit</v-card-title>
+                <v-card-title>Add new ingredientAttribute</v-card-title>
 
                 <v-divider class="mb-4" />
 
@@ -40,12 +39,12 @@
                   <v-form
                     ref="form"
                     v-model="validAdd"
-                    @submit.prevent="addUnit"
+                    @submit.prevent="addIngredientAttribute"
                   >
                     <v-row>
                       <v-col cols="12">
                         <v-text-field
-                          v-model="unitAdding.name"
+                          v-model="ingredientAttributeAdding.name"
                           type="text"
                           :label="$t('Name')"
                           :rules="rules.name"
@@ -72,7 +71,7 @@
                             color="blue darken-1"
                             text
                             :disabled="!validAdd"
-                            @click.prevent="addUnit"
+                            @click.prevent="addIngredientAttribute"
                           >
                             {{ $t('Save') }}
                           </v-btn>
@@ -112,35 +111,35 @@
               small
               @click="
                 isEditing = true
-                unitUpdating = item
+                ingredientAttributeUpdating = item
               "
             >
               mdi-pencil
             </v-icon>
           </v-btn>
           <v-btn v-if="!item.deleted_at" icon>
-            <v-icon small color="error" :disabled="!item.can_delete" @click="destroyUnit(item)">
+            <v-icon small color="error" :disabled="!item.can_delete" @click="destroyIngredientAttribute(item)">
               mdi-delete
             </v-icon>
           </v-btn>
           <v-btn v-if="!!item.deleted_at" icon>
-            <v-icon small @click="restoreUnit(item)">mdi-restore</v-icon>
+            <v-icon small @click="restoreIngredientAttribute(item)">mdi-restore</v-icon>
           </v-btn>
         </template>
       </v-data-table>
 
       <v-dialog v-model="isEditing" width="500">
         <v-card>
-          <v-card-title>Edit {{ unitUpdating.name }}</v-card-title>
+          <v-card-title>Edit {{ ingredientAttributeUpdating.name }}</v-card-title>
 
           <v-divider class="mb-4" />
 
           <v-card-text>
-            <v-form ref="form" v-model="validEdit" @submit.prevent="updateUnit">
+            <v-form ref="form" v-model="validEdit" @submit.prevent="updateIngredientAttribute">
               <v-row>
                 <v-col cols="12">
                   <v-text-field
-                    v-model="unitUpdating.name"
+                    v-model="ingredientAttributeUpdating.name"
                     type="text"
                     :label="$t('Name')"
                     :rules="rules.name"
@@ -163,7 +162,7 @@
                       color="blue darken-1"
                       text
                       :disabled="!validEdit"
-                      @click.prevent="updateUnit"
+                      @click.prevent="updateIngredientAttribute"
                     >
                       {{ $t('Save') }}
                     </v-btn>
@@ -182,12 +181,12 @@
 export default {
   data() {
     return {
-      units: [],
+      ingredientAttributes: [],
       isLoading: false,
       isEditing: false,
       isAdding: false,
-      unitUpdating: {},
-      unitAdding: {},
+      ingredientAttributeUpdating: {},
+      ingredientAttributeAdding: {},
       validAdd: true,
       validEdit: true,
       rules: {
@@ -207,7 +206,7 @@ export default {
   },
 
   mounted() {
-    this.loadUnits()
+    this.loadIngredientAttributes()
   },
 
   methods: {
@@ -217,34 +216,34 @@ export default {
         this.$config.LOCALE_FORMAT
       )
     },
-    async loadUnits() {
+    async loadIngredientAttributes() {
       this.isLoading = true
-      this.units = await this.$axios.$get('/api/units')
+      this.ingredientAttributes = await this.$axios.$get('/api/ingredient-attributes')
       this.isLoading = false
     },
-    async destroyUnit(unit) {
+    async destroyIngredientAttribute(ingredientAttribute) {
       this.isLoading = true
-      await this.$axios.$delete(`/api/units/${unit.id}`)
-      const i = this.units.findIndex((r) => r.id === unit.id)
-      this.units[i].deleted_at = new Date()
+      await this.$axios.$delete(`/api/ingredient-attributes/${ingredientAttribute.id}`)
+      const i = this.ingredientAttributes.findIndex((r) => r.id === ingredientAttribute.id)
+      this.ingredientAttributes[i].deleted_at = new Date()
       this.isLoading = false
     },
-    async restoreUnit(unit) {
+    async restoreIngredientAttribute(ingredientAttribute) {
       this.isLoading = true
-      await this.$axios.$post(`/api/units/${unit.id}/restore`)
-      const i = this.units.findIndex((r) => r.id === unit.id)
-      this.units[i].deleted_at = null
+      await this.$axios.$post(`/api/ingredient-attributes/${ingredientAttribute.id}/restore`)
+      const i = this.ingredientAttributes.findIndex((r) => r.id === ingredientAttribute.id)
+      this.ingredientAttributes[i].deleted_at = null
       this.isLoading = false
     },
-    async updateUnit() {
+    async updateIngredientAttribute() {
       this.isLoading = true
       const payload = {
-        name: this.unitUpdating.name,
-        email: this.unitUpdating.email,
-        admin: this.unitUpdating.admin,
+        name: this.ingredientAttributeUpdating.name,
+        email: this.ingredientAttributeUpdating.email,
+        admin: this.ingredientAttributeUpdating.admin,
       }
       try {
-        await this.$axios.$patch(`/api/units/${this.unitUpdating.id}`, payload)
+        await this.$axios.$patch(`/api/ingredient-attributes/${this.ingredientAttributeUpdating.id}`, payload)
       } catch (error) {
         const errors = error.response.data.errors || null
         this.errors = { ...this.errors, ...errors }
@@ -252,21 +251,21 @@ export default {
         return
       }
 
-      const i = this.units.findIndex((c) => c.id === this.unitUpdating.id)
-      this.units[i] = { ...this.units[i], ...payload }
+      const i = this.ingredientAttributes.findIndex((c) => c.id === this.ingredientAttributeUpdating.id)
+      this.ingredientAttributes[i] = { ...this.ingredientAttributes[i], ...payload }
       this.isLoading = false
-      this.unitUpdating = this.units[i]
+      this.ingredientAttributeUpdating = this.ingredientAttributes[i]
       this.isEditing = false
     },
-    async addUnit() {
+    async addIngredientAttribute() {
       this.isLoading = true
       const payload = {
-        name: this.unitAdding.name,
-        email: this.unitAdding.email,
-        admin: this.unitAdding.admin,
+        name: this.ingredientAttributeAdding.name,
+        email: this.ingredientAttributeAdding.email,
+        admin: this.ingredientAttributeAdding.admin,
       }
       try {
-        await this.$axios.$post(`/api/units`, payload)
+        await this.$axios.$post(`/api/ingredient-attributes`, payload)
       } catch (error) {
         const errors = error.response.data.errors || null
         this.errors = { ...this.errors, ...errors }
@@ -275,9 +274,9 @@ export default {
       }
 
       this.isLoading = false
-      this.unitAdding = {}
+      this.ingredientAttributeAdding = {}
       this.isAdding = false
-      this.loadUnits()
+      this.loadIngredientAttributes()
     },
   },
 }

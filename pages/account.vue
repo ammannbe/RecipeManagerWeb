@@ -51,94 +51,7 @@
               <template #top>
                 <v-btn icon absolute top right @click="toggleAddRecipe = true">
                   <v-icon>mdi-plus-circle</v-icon>
-                  <v-dialog v-model="toggleAddRecipe" width="500">
-                    <v-card>
-                      <v-card-title>{{ $t('Add new recipe') }}</v-card-title>
-
-                      <v-divider class="mb-4" />
-
-                      <v-card-text>
-                        <v-form
-                          ref="form"
-                          v-model="validAddRecipe"
-                          @submit.prevent="addRecipe"
-                        >
-                          <v-row>
-                            <v-col cols="12">
-                              <v-autocomplete
-                                v-model="newRecipe.cookbook_id"
-                                :label="$t('Cookbook')"
-                                :items="[
-                                  { name: $t('Public'), id: null },
-                                  ...cookbooks,
-                                ]"
-                                item-text="name"
-                                item-value="id"
-                                :clearable="newRecipe.cookbook_id !== null"
-                                :rules="rules.recipe.cookbook_id"
-                                :error="errors.recipe.cookbook_id.length > 0"
-                                :error-messages="errors.recipe.cookbook_id"
-                                auto-select-first
-                                dense
-                                @change="errors.recipe.cookbook_id = []"
-                              />
-                            </v-col>
-                            <v-col cols="12">
-                              <v-text-field
-                                v-model="newRecipe.name"
-                                type="text"
-                                :label="$t('Name')"
-                                :rules="rules.recipe.name"
-                                :error="errors.recipe.name.length > 0"
-                                :error-messages="errors.recipe.name"
-                                autofocus
-                                dense
-                                @input="errors.recipe.name = []"
-                              ></v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                              <v-autocomplete
-                                v-model="newRecipe.category_id"
-                                :label="$t('Category')"
-                                :items="categories"
-                                item-text="name"
-                                item-value="id"
-                                :clearable="newRecipe.category_id !== null"
-                                :rules="rules.recipe.category_id"
-                                :error="errors.recipe.category_id.length > 0"
-                                :error-messages="errors.recipe.category_id"
-                                auto-select-first
-                                dense
-                                @change="errors.recipe.category_id = []"
-                              />
-                            </v-col>
-
-                            <v-col cols="12">
-                              <v-card-actions>
-                                <v-btn
-                                  color="red darken-1"
-                                  text
-                                  @click="toggleAddRecipe = false"
-                                >
-                                  {{ $t('Cancel') }}
-                                </v-btn>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                  type="submit"
-                                  color="blue darken-1"
-                                  text
-                                  :disabled="!validAddRecipe"
-                                  @click.prevent="addRecipe"
-                                >
-                                  {{ $t('Save & Edit') }}
-                                </v-btn>
-                              </v-card-actions>
-                            </v-col>
-                          </v-row>
-                        </v-form>
-                      </v-card-text>
-                    </v-card>
-                  </v-dialog>
+                  <recipe-add :showDialog="toggleAddRecipe" :cookbooks="cookbooks" :categories="categories" @loading="recipePagination.isLoading = $event" @close="toggleAddRecipe = $event"></recipe-add>
                 </v-btn>
               </template>
               <template #item.name="{ item }">
@@ -379,7 +292,7 @@ export default {
 
     const cookbookPagination = {
       page: 1,
-      limit: 5,
+      limit: 15,
       total: 0,
       isLoading: false,
     }
@@ -414,13 +327,7 @@ export default {
       newCookbookName: null,
       toggleAddCookbook: false,
       validAddCookbook: true,
-      newRecipe: {
-        cookbook_id: null,
-        name: null,
-        category_id: null,
-      },
       toggleAddRecipe: false,
-      validAddRecipe: true,
       rules: {
         cookbook: {
           name: [
@@ -430,25 +337,9 @@ export default {
               this.$t('Max {0} characters allowed', [20]),
           ],
         },
-        recipe: {
-          name: [
-            (v) => !!v || this.$t('{0} is required', [this.$t('Name')]),
-            (v) =>
-              (!!v && v.length <= 100) ||
-              this.$t('Max {0} characters allowed', [100]),
-          ],
-          category_id: [
-            (v) => !!v || this.$t('{0} is required', [this.$t('Category')]),
-          ],
-        },
       },
       errors: {
         cookbook: { name: [] },
-        recipe: {
-          name: [],
-          category_id: [],
-          cookbook_id: [],
-        },
       },
       valid: true,
     }
@@ -477,7 +368,7 @@ export default {
       }
 
       if (itemsPerPage === -1) {
-        itemsPerPage = p.limit || 10
+        itemsPerPage = p.limit || 15
       }
 
       await this.loadRecipes({ page, limit: itemsPerPage })
@@ -489,7 +380,7 @@ export default {
       }
 
       if (itemsPerPage === -1) {
-        itemsPerPage = p.limit || 5
+        itemsPerPage = p.limit || 15
       }
 
       await this.loadCookbooks({ page, limit: itemsPerPage })
@@ -570,33 +461,6 @@ export default {
       this.cookbooks[i].name = name
       this.cookbookPagination.isLoading = false
       this.cookbookRenaming = null
-    },
-    async addRecipe() {
-      this.cookbookPagination.isLoading = true
-
-      try {
-        const newRecipe = await this.$axios.$post('/api/recipes', {
-          ...this.newRecipe,
-          servings: 4,
-          serving_type: null,
-          complexity: 'normal',
-          instructions: this.$t('Add here some instructions to your recipe'),
-        })
-        this.recipes.push(newRecipe)
-        this.toggleAddRecipe = false
-
-        const path = this.localePath({
-          name: 'recipes-id',
-          params: { id: newRecipe.id },
-          query: { edit: true },
-        })
-        this.$nuxt.$router.push(path)
-      } catch (error) {
-        const errors = error.response.data.errors || null
-        this.errors.recipe = { ...this.errors.recipe, ...errors }
-      }
-
-      this.recipePagination.isLoading = false
     },
     async destroyRecipe(recipe) {
       this.recipePagination.isLoading = true
