@@ -1,5 +1,5 @@
 # Dockerfile
-FROM node:16.6-alpine
+FROM node:19.8-alpine
 
 # create destination directory
 RUN mkdir -p /usr/src/recipe-manager
